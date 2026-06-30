@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Konversi Tahun Masehi ↔ Hijriyah</title>
+<style>
+@font-face{font-family:'Inter-fallback';src:local('Arial');}
+:root{
+  --navy-950: #0b1b1a;
+  --green-900: #0e3b30;
+  --green-800: #155c43;
+  --green-700: #1c7a55;
+  --blue-700: #1d4f91;
+  --gold-500: #c79a4b;
+  --gold-400: #d9b56e;
+  --gold-100: #f6ecd6;
+  --paper: #fafbfa;
+  --paper-card: #ffffff;
+  --ink: #1b2421;
+  --ink-soft: #5b6660;
+  --line: #e6e9e5;
+  --shadow-soft: 0 10px 30px -12px rgba(11,27,26,0.20);
+  --shadow-card: 0 1px 2px rgba(11,27,26,0.04), 0 8px 24px -8px rgba(11,27,26,0.10);
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+
+body{
+  background: radial-gradient(1200px 600px at 50% -10%, #eaf3ee 0%, var(--paper) 55%);
+  font-family: 'Segoe UI', Inter, Arial, sans-serif;
+  color:var(--ink);
+  min-height:100vh;
+  padding: 32px 16px 64px;
+  -webkit-font-smoothing:antialiased;
+}
+
+.wrap{ max-width: 660px; margin: 0 auto; }
+
+/* ===== Header ===== */
+header{ text-align:center; margin-bottom: 24px; }
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase;
+  color:var(--gold-500); background: var(--navy-950);
+  padding:6px 14px; border-radius:999px; margin-bottom:16px;
+}
+.eyebrow svg{width:13px;height:13px;}
+h1{
+  font-size: clamp(23px, 5vw, 31px); font-weight:700;
+  color: var(--green-900); margin:0 0 6px; line-height:1.25;
+}
+h1 span{color:var(--gold-500);}
+.arabic-sub{ font-size:17px; color: var(--green-700); margin: 2px 0 10px; direction: rtl; }
+header p{ color:var(--ink-soft); font-size:14.5px; margin:0; line-height:1.6; }
+
+/* ===== Tab Navigation ===== */
+.tabs{
+  display:grid; grid-template-columns: 1fr 1fr; gap:8px;
+  background:#eceeec; border-radius:16px; padding:6px; margin-bottom:20px;
+}
+.tab-btn{
+  border:none; background:transparent; padding:13px 10px; border-radius:12px;
+  font-weight:600; font-size:13.5px; color: var(--ink-soft); cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+}
+.tab-btn svg{width:16px;height:16px;flex-shrink:0;}
+.tab-btn.active{ background:#fff; color: var(--green-900); box-shadow: 0 3px 10px -2px rgba(11,27,26,0.18); }
+.tab-btn:not(.active):hover{color:var(--green-700);}
+
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ===== Card umum ===== */
+.card{
+  background:var(--paper-card); border-radius:20px; box-shadow: var(--shadow-card);
+  border:1px solid var(--line); padding:24px; margin-bottom:20px;
+}
+.form-title{
+  font-weight:600; font-size:16px; color:var(--green-900);
+  margin:0 0 4px; display:flex; align-items:center; gap:8px;
+}
+.form-sub{ font-size:13px; color:var(--ink-soft); margin:0 0 18px; }
+
+.field-row{ display:grid; grid-template-columns: 0.8fr 1.6fr 1fr; gap:12px; margin-bottom:16px; }
+.field label{
+  display:block; font-size:12px; font-weight:600; color:var(--green-800);
+  margin-bottom:6px; letter-spacing:0.02em;
+}
+.field select, .field input{
+  width:100%; padding:12px 12px; border-radius:12px; border:1.5px solid var(--line);
+  background:#fcfdfc; font-size:15px; font-weight:500; color:var(--ink);
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  appearance:none; font-family:inherit;
+}
+.field select{
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235b6660' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat:no-repeat; background-position: right 12px center; padding-right:32px;
+}
+.field select:focus, .field input:focus{
+  outline:none; border-color: var(--gold-500); background:#fff;
+  box-shadow: 0 0 0 4px rgba(199,154,75,0.12);
+}
+.field input::placeholder{color:#b3bdb6;}
+
+.btn{
+  border:none; border-radius:13px; font-weight:600; font-size:15px;
+  padding:14px 16px; cursor:pointer; font-family:inherit;
+  transition: transform .12s ease, box-shadow .12s ease, background .15s ease, color .15s ease, border-color .15s ease;
+}
+.btn:active{transform: translateY(1px) scale(0.99);}
+
+.btn-primary{
+  width:100%;
+  background: linear-gradient(135deg, var(--blue-700), var(--green-900));
+  color:#fff; box-shadow: 0 8px 20px -6px rgba(11,27,26,0.45); margin-bottom:14px;
+}
+.btn-primary:hover{ box-shadow: 0 10px 26px -6px rgba(11,27,26,0.55); transform: translateY(-1px); }
+
+.btn-ghost{
+  width:100%; background:#fff; color: var(--green-800); border:1.5px solid var(--line);
+  font-size:13.5px; padding:11px 10px; text-align:center;
+}
+.btn-ghost:hover{ border-color: var(--gold-400); color: var(--gold-500); background: var(--gold-100); }
+
+.error-msg{
+  display:none; margin-top:14px; background:#fdecec; border:1px solid #f3c8c8;
+  color:#9c3232; font-size:13px; font-weight:500; padding:10px 14px; border-radius:10px;
+}
+
+/* ===== Hasil ===== */
+.result-section{display:none;}
+
+.result-card{
+  background: linear-gradient(160deg, var(--navy-950) 0%, var(--green-900) 100%);
+  color:#fff; border-radius:22px; padding:32px 24px; text-align:center;
+  box-shadow: var(--shadow-soft); position:relative; overflow:hidden; margin-bottom:18px;
+}
+.result-card::before{
+  content:''; position:absolute; top:-35%; right:-15%; width:260px; height:260px;
+  background: radial-gradient(circle, rgba(217,181,110,0.18), transparent 70%);
+}
+.result-label{
+  font-size:12.5px; letter-spacing:0.08em; text-transform:uppercase;
+  color: var(--gold-400); font-weight:600; margin-bottom:10px; position:relative;
+}
+.result-utama{
+  font-size: clamp(26px, 7vw, 36px); font-weight:800; line-height:1.3; margin:0; position:relative;
+}
+.result-divider{ width:42px;height:3px; background:var(--gold-500); border-radius:4px; margin: 16px auto 14px; }
+.result-note{ font-size:13px; color:#cfe3d6; position:relative; line-height:1.6; }
+
+/* ===== Accordion ===== */
+.accordion{
+  background:var(--paper-card); border-radius:18px; border:1px solid var(--line);
+  box-shadow: var(--shadow-card); overflow:hidden;
+}
+.accordion-head{
+  display:flex; align-items:center; justify-content:space-between; padding:18px 20px;
+  cursor:pointer; user-select:none;
+}
+.accordion-head h3{
+  margin:0; font-size:15px; font-weight:600; color:var(--green-900);
+  display:flex; align-items:center; gap:8px;
+}
+.chevron{ width:18px;height:18px; color:var(--ink-soft); transition: transform .25s ease; flex-shrink:0; }
+.accordion.open .chevron{ transform: rotate(180deg); color:var(--gold-500);}
+
+.accordion-body{ max-height:0; overflow:hidden; transition: max-height .35s ease; }
+.accordion-body-inner{ padding: 0 20px 22px; }
+
+.step-block{ margin-bottom:16px; padding-bottom:14px; border-bottom:1px dashed var(--line); }
+.step-block:last-child{border-bottom:none; margin-bottom:0; padding-bottom:0;}
+.step-label{
+  font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+  color: var(--gold-500); margin-bottom:8px; display:flex; align-items:center; gap:6px;
+}
+.step-label .dot{ width:6px;height:6px;border-radius:50%; background:var(--gold-500); }
+.calc-line{
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size:12.6px; color:var(--ink); background:#f5f8f6; border:1px solid var(--line);
+  border-radius:9px; padding:9px 12px; margin-bottom:6px; line-height:1.6; word-break:break-word;
+}
+.calc-line b{color:var(--green-900); font-weight:700;}
+.calc-line .res{color:var(--gold-500); font-weight:700;}
+.calc-line.final{ background: #eaf6ee; border-color: #cfe6cf; }
+.calc-line.final .res{color:#2c7a3a;}
+
+.mundur-list{
+  display:flex; flex-direction:column; gap:6px; margin-top:8px;
+}
+.mundur-item{
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size:12px; padding:7px 11px; border-radius:8px; background:#fff;
+  border:1px solid var(--line); display:flex; justify-content:space-between; gap:10px;
+}
+.mundur-item.stop{ background:#eaf6ee; border-color:#cfe6cf; font-weight:700; }
+
+footer{ text-align:center; margin-top: 28px; font-size:12px; color:#93a399; }
+
+/* ===== Mobile ===== */
+@media (max-width:480px){
+  .field-row{
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "tgl bln" "thn thn";
+  }
+  .field-row .field:nth-child(1){grid-area:tgl;}
+  .field-row .field:nth-child(2){grid-area:bln;}
+  .field-row .field:nth-child(3){grid-area:thn;}
+  .card{padding:20px;}
+  .tab-btn span.tab-label-full{display:none;}
+}
+
+@media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c.51 0 1.01.04 1.5.12M21 3v6h-6"/></svg>
+      Tahwilus Sanah — Ilmu Falak
+    </div>
+    <h1>Konversi <span>Tahun</span> Masehi ↔ Hijriyah</h1>
+    <div class="arabic-sub">تحويل السنة</div>
+    <p>Oleh : M.Sholeh Bakhruddin</p>
+  </header>
+
+  <!-- ===== TAB NAVIGATION ===== -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-btn-m2h" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M9 14l3 3 7-7"/></svg>
+      <span class="tab-label-full">Masehi → Hijriyah</span>
+    </button>
+    <button class="tab-btn" id="tab-btn-h2m" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+      <span class="tab-label-full">Hijriyah → Masehi</span>
+    </button>
+  </div>
+
+  <!-- =====================================================================
+       TAB PANEL 1: MASEHI -> HIJRIYAH
+       ===================================================================== -->
+  <div class="tab-panel active" id="panel-m2h">
+
+    <div class="card">
+      <p class="form-title">📅 Masukkan Tanggal Masehi</p>
+      <p class="form-sub"></p>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="m2h-tanggal">Tanggal</label>
+          <select id="m2h-tanggal"></select>
+        </div>
+        <div class="field">
+          <label for="m2h-bulan">Bulan</label>
+          <select id="m2h-bulan">
+            <option value="1">Januari</option><option value="2">Februari</option>
+            <option value="3">Maret</option><option value="4">April</option>
+            <option value="5">Mei</option><option value="6">Juni</option>
+            <option value="7">Juli</option><option value="8">Agustus</option>
+            <option value="9">September</option><option value="10">Oktober</option>
+            <option value="11">November</option><option value="12">Desember</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="m2h-tahun">Tahun M</label>
+          <input type="number" id="m2h-tahun" placeholder="cth: 1944" inputmode="numeric">
+        </div>
+      </div>
+
+      <div class="error-msg" id="m2h-error-msg"></div>
+
+      <button class="btn btn-primary" id="m2h-btn-hitung" type="button">Hitung Konversi</button>
+      <button class="btn btn-ghost" id="m2h-btn-contoh" type="button">Contoh: 17 Juli 1944</button>
+    </div>
+
+    <div class="result-section" id="m2h-result-section">
+      <div class="result-card">
+        <div class="result-label" id="m2h-res-asal">17 Juli 1944 M</div>
+        <p class="result-utama" id="m2h-res-utama">27 Rajab 1363 H</p>
+        <div class="result-divider"></div>
+        <p class="result-note" id="m2h-res-note">Status tahun hasil: Kabisat</p>
+      </div>
+
+      <div class="accordion" id="m2h-accordion">
+        <div class="accordion-head" id="m2h-accordion-head">
+          <h3>📖 Lihat Langkah Perhitungan</h3>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="accordion-body" id="m2h-accordion-body">
+          <div class="accordion-body-inner" id="m2h-accordion-content"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- =====================================================================
+       TAB PANEL 2: HIJRIYAH -> MASEHI
+       ===================================================================== -->
+  <div class="tab-panel" id="panel-h2m">
+
+    <div class="card">
+      <p class="form-title">🌙 Masukkan Tanggal Hijriyah</p>
+      <p class="form-sub"></p>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="h2m-tanggal">Tanggal</label>
+          <select id="h2m-tanggal"></select>
+        </div>
+        <div class="field">
+          <label for="h2m-bulan">Bulan Hijriyah</label>
+          <select id="h2m-bulan">
+            <option value="1">1. Muharrom</option>
+            <option value="2">2. Shofar</option>
+            <option value="3">3. Rabi'ul Awwal</option>
+            <option value="4">4. Rabi'us Tsani</option>
+            <option value="5">5. Jumadil Ula</option>
+            <option value="6">6. Jumadis Tsaniyah</option>
+            <option value="7">7. Rajab</option>
+            <option value="8">8. Sya'ban</option>
+            <option value="9">9. Ramadhan</option>
+            <option value="10">10. Syawwal</option>
+            <option value="11">11. Dzul Qo'dah</option>
+            <option value="12">12. Dzul Hijjah</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="h2m-tahun">Tahun H</label>
+          <input type="number" id="h2m-tahun" placeholder="cth: 1438" inputmode="numeric">
+        </div>
+      </div>
+
+      <div class="error-msg" id="h2m-error-msg"></div>
+
+      <button class="btn btn-primary" id="h2m-btn-hitung" type="button">Hitung Konversi</button>
+      <button class="btn btn-ghost" id="h2m-btn-contoh" type="button">Contoh: 1 J. Tsaniyah 1438 H</button>
+    </div>
+
+    <div class="result-section" id="h2m-result-section">
+      <div class="result-card">
+        <div class="result-label" id="h2m-res-asal">1 Jumadis Tsaniyah 1438 H</div>
+        <p class="result-utama" id="h2m-res-utama">28 Februari 2017</p>
+        <div class="result-divider"></div>
+        <p class="result-note" id="h2m-res-note">Status tahun hasil: Basithoh</p>
+      </div>
+
+      <div class="accordion" id="h2m-accordion">
+        <div class="accordion-head" id="h2m-accordion-head">
+          <h3>📖 Lihat Langkah Perhitungan</h3>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="accordion-body" id="h2m-accordion-body">
+          <div class="accordion-body-inner" id="h2m-accordion-content"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>Semoga Bermanfaat🙏😊</footer>
+</div>
+
+<script>
+/* =====================================================================
+   KALKULATOR KONVERSI TAHUN (TAHWILUS SANAH) — MASEHI <-> HIJRIYAH
+   Murni rumus matematika berbasis jumlah hari. Tidak ada fungsi Date()
+   bawaan JavaScript maupun library kalender eksternal yang dipakai.
+
+   KONSTANTA UTAMA:
+   - 365.2425   = rata-rata jumlah hari dalam 1 tahun Masehi (siklus Gregorian)
+   - 354.3666667 = rata-rata jumlah hari dalam 1 tahun Hijriyah (siklus 30 tahun)
+   - 227014     = offset/selisih hari antara Ashlut Tarikh Miladiy & Hijriy
+   ===================================================================== */
+
+const KONST_TAHUN_MASEHI = 365.2425;
+const KONST_TAHUN_HIJRIYAH = 354.3666667;
+const OFFSET_HARI = 227014;
+
+// Daftar angka sisa (mod 30) yang termasuk siklus Tahun Kabisat Hijriyah
+const SIKLUS_KABISAT_H = [2, 5, 7, 10, 13, 16, 18, 21, 24, 26, 29];
+
+const NAMA_BULAN_M = ["Januari","Februari","Maret","April","Mei","Juni",
+                       "Juli","Agustus","September","Oktober","November","Desember"];
+
+const NAMA_BULAN_H = ["Muharrom", "Shofar", "Rabi'ul Awwal", "Rabi'us Tsani",
+                       "Jumadil Ula", "Jumadis Tsaniyah", "Rajab", "Sya'ban",
+                       "Ramadhan", "Syawwal", "Dzul Qo'dah", "Dzul Hijjah"];
+
+/** Cek tahun Masehi Kabisat: habis dibagi 4 -> Februari = 29 hari. */
+function isKabisatMasehi(tahun) { return tahun % 4 === 0; }
+
+/** Cek tahun Hijriyah Kabisat: sisa (tahun % 30) masuk siklus -> Dzul Hijjah = 30 hari. */
+function isKabisatHijriyah(tahun) { return SIKLUS_KABISAT_H.includes(tahun % 30); }
+
+/** Jumlah hari tiap bulan Masehi sesuai status kabisat. */
+function jumlahHariBulanMasehi(kabisat) {
+  return [31, kabisat ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+}
+
+/** Jumlah hari tiap bulan Hijriyah sesuai status kabisat (Dzul Hijjah 29/30). */
+function jumlahHariBulanHijriyah(kabisat) {
+  return [30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, kabisat ? 30 : 29];
+}
+
+
+/* =====================================================================
+   BAGIAN TAB NAVIGATION
+   ===================================================================== */
+const tabBtnM2H = document.getElementById('tab-btn-m2h');
+const tabBtnH2M = document.getElementById('tab-btn-h2m');
+const panelM2H = document.getElementById('panel-m2h');
+const panelH2M = document.getElementById('panel-h2m');
+
+function aktifkanTab(tab) {
+  const isM2H = tab === 'm2h';
+  tabBtnM2H.classList.toggle('active', isM2H);
+  tabBtnH2M.classList.toggle('active', !isM2H);
+  panelM2H.classList.toggle('active', isM2H);
+  panelH2M.classList.toggle('active', !isM2H);
+}
+tabBtnM2H.addEventListener('click', () => aktifkanTab('m2h'));
+tabBtnH2M.addEventListener('click', () => aktifkanTab('h2m'));
+
+// Isi dropdown tanggal (1-31 untuk Masehi, 1-30 untuk Hijriyah)
+const selTanggalM2H = document.getElementById('m2h-tanggal');
+for (let i = 1; i <= 31; i++) {
+  const opt = document.createElement('option'); opt.value = i; opt.textContent = i;
+  selTanggalM2H.appendChild(opt);
+}
+const selTanggalH2M = document.getElementById('h2m-tanggal');
+for (let i = 1; i <= 30; i++) {
+  const opt = document.createElement('option'); opt.value = i; opt.textContent = i;
+  selTanggalH2M.appendChild(opt);
+}
+
+
+/* =====================================================================
+   FUNGSI UTAMA 1: KONVERSI MASEHI -> HIJRIYAH
+   ===================================================================== */
+function konversiMasehiKeHijriyah(tanggal, bulan, tahun) {
+  const log = [];
+
+  // Langkah a-b: status kabisat tahun Masehi target, Tahun Tam, Bulan Tam
+  const kabisatTarget = isKabisatMasehi(tahun);
+  const jhMasehi = jumlahHariBulanMasehi(kabisatTarget);
+  const tahunTam = tahun - 1;
+  let bulanTam = 0;
+  let rincianBulanTam = [];
+  for (let i = 0; i < bulan - 1; i++) {
+    bulanTam += jhMasehi[i];
+    rincianBulanTam.push(`${NAMA_BULAN_M[i]} (${jhMasehi[i]})`);
+  }
+
+  log.push({
+    section: "Langkah Awal",
+    lines: [
+      { label: `${tahun} % 4`, value: `${tahun % 4}`, note: kabisatTarget ? "Kabisat (Februari = 29 hari)" : "Basithoh (Februari = 28 hari)" },
+      { label: "Tahun Tam", value: `${tahun} - 1 = ${tahunTam}` },
+      { label: "Bulan Tam", value: bulan === 1
+          ? "0 (bulan target Januari, belum ada bulan sebelumnya)"
+          : `${rincianBulanTam.join(" + ")} = ${bulanTam}` }
+    ]
+  });
+
+  // Langkah c-e: Hasil 1, Hasil 2, Hasil 3 (Ashlut Tarikh Miladiy)
+  const hasil1 = tahunTam * KONST_TAHUN_MASEHI;
+  const hasil2 = hasil1 + tanggal + bulanTam;
+  const hasil3 = hasil2 - OFFSET_HARI;
+
+  log.push({
+    section: "Hasil 1, 2, 3 (Ashlut Tarikh Miladiy)",
+    lines: [
+      { label: "Hasil 1", value: `Tahun Tam × ${KONST_TAHUN_MASEHI} = ${tahunTam} × ${KONST_TAHUN_MASEHI} = ${hasil1.toFixed(4)}` },
+      { label: "Hasil 2", value: `Hasil 1 + Tanggal + Bulan Tam = ${hasil1.toFixed(4)} + ${tanggal} + ${bulanTam} = ${hasil2.toFixed(4)}` },
+      { label: "Hasil 3", value: `Hasil 2 - ${OFFSET_HARI} = ${hasil2.toFixed(4)} - ${OFFSET_HARI} = ${hasil3.toFixed(4)}`, note: "Ashlut Tarikh Miladiy" }
+    ]
+  });
+
+  // Langkah f: bagi Hasil 3 dengan 354.3666667
+  const pembagian = hasil3 / KONST_TAHUN_HIJRIYAH;
+  const tahunTamH = Math.floor(pembagian);
+  const tahunHasilH = tahunTamH + 1;
+  const kabisatHasilH = isKabisatHijriyah(tahunHasilH);
+  const pecahan = pembagian - tahunTamH;
+
+  log.push({
+    section: "Pembagian & Penentuan Tahun Hijriyah",
+    lines: [
+      { label: "Hasil 3 ÷ " + KONST_TAHUN_HIJRIYAH, value: `${hasil3.toFixed(4)} ÷ ${KONST_TAHUN_HIJRIYAH} = ${pembagian.toFixed(6)}` },
+      { label: "Angka sebelum koma", value: `${tahunTamH}`, note: "Tahun Tam Hijriyah" },
+      { label: "Tahun Hijriyah Hasil", value: `${tahunTamH} + 1 = ${tahunHasilH}` },
+      { label: `${tahunHasilH} % 30`, value: `${tahunHasilH % 30}`, note: kabisatHasilH ? "Kabisat (Dzul Hijjah = 30 hari)" : "Basithoh (Dzul Hijjah = 29 hari)" },
+      { label: "Angka setelah koma", value: `${pembagian.toFixed(6)} - ${tahunTamH} = ${pecahan.toFixed(6)}`, note: "Sisa pecahan" }
+    ]
+  });
+
+  // Langkah g: sisa pecahan x 354.3666667, dibulatkan
+  const totalHariEksak = pecahan * KONST_TAHUN_HIJRIYAH;
+  const totalHari = Math.round(totalHariEksak);
+
+  log.push({
+    section: "Total Hari dari 01 Muharrom",
+    lines: [
+      { label: "Pecahan × " + KONST_TAHUN_HIJRIYAH, value: `${pecahan.toFixed(6)} × ${KONST_TAHUN_HIJRIYAH} = ${totalHariEksak.toFixed(4)}` },
+      { label: "Dibulatkan (Math.round)", value: `${totalHari}`, note: "Total hari dari 01 Muharrom" }
+    ]
+  });
+
+  // Langkah h: konversi total hari -> tanggal & bulan Hijriyah (pengurangan berurutan)
+  const jhHijriyahHasil = jumlahHariBulanHijriyah(kabisatHasilH);
+  let sisaHari = Math.max(totalHari, 1); // minimal hari ke-1
+  let bulanHasil = 0;
+  let mundurList = [];
+  while (sisaHari > jhHijriyahHasil[bulanHasil]) {
+    mundurList.push({ bulan: NAMA_BULAN_H[bulanHasil], jumlahHari: jhHijriyahHasil[bulanHasil], sisaSebelum: sisaHari, sisaSesudah: sisaHari - jhHijriyahHasil[bulanHasil] });
+    sisaHari -= jhHijriyahHasil[bulanHasil];
+    bulanHasil++;
+    if (bulanHasil > 11) { bulanHasil = 11; break; } // safety, praktiknya tidak pernah tercapai
+  }
+  const tanggalHasil = sisaHari;
+  const namaBulanHasil = NAMA_BULAN_H[bulanHasil];
+
+  log.push({
+    section: "Mencari Tanggal & Bulan Akhir (Pengurangan Berurutan)",
+    lines: [],
+    mundurList: mundurList,
+    finalNote: `Hari ke-${totalHari} jatuh pada tanggal ${tanggalHasil} ${namaBulanHasil} ${tahunHasilH} H`
+  });
+
+  return {
+    hasilAkhir: `${tanggalHasil} ${namaBulanHasil} ${tahunHasilH} H`,
+    kabisatHasil: kabisatHasilH,
+    log
+  };
+}
+
+
+/* =====================================================================
+   FUNGSI UTAMA 2: KONVERSI HIJRIYAH -> MASEHI
+   ===================================================================== */
+function konversiHijriyahKeMasehi(tanggal, bulan, tahun) {
+  const log = [];
+
+  // Langkah a-b: status kabisat tahun Hijriyah target, Tahun Tam, Bulan Tam
+  const kabisatTarget = isKabisatHijriyah(tahun);
+  const jhHijriyah = jumlahHariBulanHijriyah(kabisatTarget);
+  const tahunTam = tahun - 1;
+  let bulanTam = 0;
+  let rincianBulanTam = [];
+  for (let i = 0; i < bulan - 1; i++) {
+    bulanTam += jhHijriyah[i];
+    rincianBulanTam.push(`${NAMA_BULAN_H[i]} (${jhHijriyah[i]})`);
+  }
+
+  log.push({
+    section: "Langkah Awal",
+    lines: [
+      { label: `${tahun} % 30`, value: `${tahun % 30}`, note: kabisatTarget ? "Kabisat (Dzul Hijjah = 30 hari)" : "Basithoh (Dzul Hijjah = 29 hari)" },
+      { label: "Tahun Tam", value: `${tahun} - 1 = ${tahunTam}` },
+      { label: "Bulan Tam", value: bulan === 1
+          ? "0 (bulan target Muharrom, belum ada bulan sebelumnya)"
+          : `${rincianBulanTam.join(" + ")} = ${bulanTam}` }
+    ]
+  });
+
+  // Langkah c-e: Hasil 1, Hasil 2, Hasil 3 (Ashlut Tarikh Hijriy)
+  const hasil1 = tahunTam * KONST_TAHUN_HIJRIYAH;
+  const hasil2 = hasil1 + tanggal + bulanTam;
+  const hasil3 = hasil2 + OFFSET_HARI;
+
+  log.push({
+    section: "Hasil 1, 2, 3 (Ashlut Tarikh Hijriy)",
+    lines: [
+      { label: "Hasil 1", value: `Tahun Tam × ${KONST_TAHUN_HIJRIYAH} = ${tahunTam} × ${KONST_TAHUN_HIJRIYAH} = ${hasil1.toFixed(4)}` },
+      { label: "Hasil 2", value: `Hasil 1 + Tanggal + Bulan Tam = ${hasil1.toFixed(4)} + ${tanggal} + ${bulanTam} = ${hasil2.toFixed(4)}` },
+      { label: "Hasil 3", value: `Hasil 2 + ${OFFSET_HARI} = ${hasil2.toFixed(4)} + ${OFFSET_HARI} = ${hasil3.toFixed(4)}`, note: "Ashlut Tarikh Hijriy" }
+    ]
+  });
+
+  // Langkah f: bagi Hasil 3 dengan 365.2425
+  const pembagian = hasil3 / KONST_TAHUN_MASEHI;
+  const tahunTamM = Math.floor(pembagian);
+  const tahunHasilM = tahunTamM + 1;
+  const kabisatHasilM = isKabisatMasehi(tahunHasilM);
+  const pecahan = pembagian - tahunTamM;
+
+  log.push({
+    section: "Pembagian & Penentuan Tahun Masehi",
+    lines: [
+      { label: "Hasil 3 ÷ " + KONST_TAHUN_MASEHI, value: `${hasil3.toFixed(4)} ÷ ${KONST_TAHUN_MASEHI} = ${pembagian.toFixed(6)}` },
+      { label: "Angka sebelum koma", value: `${tahunTamM}`, note: "Tahun Tam Masehi" },
+      { label: "Tahun Masehi Hasil", value: `${tahunTamM} + 1 = ${tahunHasilM}` },
+      { label: `${tahunHasilM} % 4`, value: `${tahunHasilM % 4}`, note: kabisatHasilM ? "Kabisat (Februari = 29 hari)" : "Basithoh (Februari = 28 hari)" },
+      { label: "Angka setelah koma", value: `${pembagian.toFixed(6)} - ${tahunTamM} = ${pecahan.toFixed(6)}`, note: "Sisa pecahan" }
+    ]
+  });
+
+  // Langkah g: sisa pecahan x 365.2425, dibulatkan
+  const totalHariEksak = pecahan * KONST_TAHUN_MASEHI;
+  const totalHari = Math.round(totalHariEksak);
+
+  log.push({
+    section: "Total Hari dari 01 Januari",
+    lines: [
+      { label: "Pecahan × " + KONST_TAHUN_MASEHI, value: `${pecahan.toFixed(6)} × ${KONST_TAHUN_MASEHI} = ${totalHariEksak.toFixed(4)}` },
+      { label: "Dibulatkan (Math.round)", value: `${totalHari}`, note: "Total hari dari 01 Januari" }
+    ]
+  });
+
+  // Langkah h: konversi total hari -> tanggal & bulan Masehi (pengurangan berurutan)
+  const jhMasehiHasil = jumlahHariBulanMasehi(kabisatHasilM);
+  let sisaHari = Math.max(totalHari, 1);
+  let bulanHasil = 0;
+  let mundurList = [];
+  while (sisaHari > jhMasehiHasil[bulanHasil]) {
+    mundurList.push({ bulan: NAMA_BULAN_M[bulanHasil], jumlahHari: jhMasehiHasil[bulanHasil], sisaSebelum: sisaHari, sisaSesudah: sisaHari - jhMasehiHasil[bulanHasil] });
+    sisaHari -= jhMasehiHasil[bulanHasil];
+    bulanHasil++;
+    if (bulanHasil > 11) { bulanHasil = 11; break; }
+  }
+  const tanggalHasil = sisaHari;
+  const namaBulanHasil = NAMA_BULAN_M[bulanHasil];
+
+  log.push({
+    section: "Mencari Tanggal & Bulan Akhir (Pengurangan Berurutan)",
+    lines: [],
+    mundurList: mundurList,
+    finalNote: `Hari ke-${totalHari} jatuh pada tanggal ${tanggalHasil} ${namaBulanHasil} ${tahunHasilM}`
+  });
+
+  return {
+    hasilAkhir: `${tanggalHasil} ${namaBulanHasil} ${tahunHasilM}`,
+    kabisatHasil: kabisatHasilM,
+    log
+  };
+}
+
+
+/* =====================================================================
+   VALIDASI INPUT
+   ===================================================================== */
+function validasiTanggalMasehi(tanggal, bulan, tahun) {
+  if (!tahun || tahun < 1 || tahun > 9999) return "Tahun harus diisi dengan angka yang valid (1–9999).";
+  const kabisat = isKabisatMasehi(tahun);
+  const maxHari = jumlahHariBulanMasehi(kabisat)[bulan - 1];
+  if (tanggal > maxHari) return `Tanggal tidak valid. ${NAMA_BULAN_M[bulan - 1]} ${tahun} hanya memiliki ${maxHari} hari.`;
+  return null;
+}
+
+function validasiTanggalHijriyah(tanggal, bulan, tahun) {
+  if (!tahun || tahun < 1 || tahun > 9999) return "Tahun Hijriyah harus diisi dengan angka yang valid (1–9999).";
+  const kabisat = isKabisatHijriyah(tahun);
+  const maxHari = jumlahHariBulanHijriyah(kabisat)[bulan - 1];
+  if (tanggal > maxHari) return `Tanggal tidak valid. ${NAMA_BULAN_H[bulan - 1]} ${tahun} H hanya memiliki ${maxHari} hari.`;
+  return null;
+}
+
+
+/* =====================================================================
+   RENDER ACCORDION (dipakai bersama kedua tab)
+   ===================================================================== */
+function renderLangkahPerhitungan(log) {
+  let html = "";
+  log.forEach(block => {
+    html += `<div class="step-block">`;
+    html += `<div class="step-label"><span class="dot"></span>${block.section}</div>`;
+
+    block.lines.forEach(line => {
+      html += `<div class="calc-line">`;
+      html += `<b>${line.label}:</b> ${line.value}`;
+      if (line.note) html += ` <span class="res">— ${line.note}</span>`;
+      html += `</div>`;
+    });
+
+    // Render daftar pengurangan berurutan (jika ada)
+    if (block.mundurList) {
+      html += `<div class="mundur-list">`;
+      block.mundurList.forEach(m => {
+        html += `<div class="mundur-item"><span>${m.bulan} (${m.jumlahHari} hari)</span><span>${m.sisaSebelum} − ${m.jumlahHari} = ${m.sisaSesudah}</span></div>`;
+      });
+      html += `<div class="mundur-item stop">${block.finalNote}</div>`;
+      html += `</div>`;
+    }
+
+    html += `</div>`;
+  });
+  return html;
+}
+
+
+/* =====================================================================
+   EVENT HANDLERS — TAB MASEHI -> HIJRIYAH
+   ===================================================================== */
+document.getElementById('m2h-btn-hitung').addEventListener('click', () => {
+  const tanggal = parseInt(document.getElementById('m2h-tanggal').value, 10);
+  const bulan = parseInt(document.getElementById('m2h-bulan').value, 10);
+  const tahun = parseInt(document.getElementById('m2h-tahun').value, 10);
+
+  const errorBox = document.getElementById('m2h-error-msg');
+  const pesanError = validasiTanggalMasehi(tanggal, bulan, tahun);
+  if (pesanError) {
+    errorBox.textContent = pesanError;
+    errorBox.style.display = "block";
+    document.getElementById('m2h-result-section').style.display = "none";
+    return;
+  }
+  errorBox.style.display = "none";
+
+  const hasil = konversiMasehiKeHijriyah(tanggal, bulan, tahun);
+
+  document.getElementById('m2h-res-asal').textContent = `${tanggal} ${NAMA_BULAN_M[bulan - 1]} ${tahun} M`;
+  document.getElementById('m2h-res-utama').textContent = hasil.hasilAkhir;
+  document.getElementById('m2h-res-note').textContent = `Status tahun hasil: ${hasil.kabisatHasil ? "Kabisat" : "Basithoh"}`;
+
+  document.getElementById('m2h-accordion-content').innerHTML = renderLangkahPerhitungan(hasil.log);
+  document.getElementById('m2h-result-section').style.display = "block";
+  document.getElementById('m2h-result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+document.getElementById('m2h-btn-contoh').addEventListener('click', () => {
+  document.getElementById('m2h-tanggal').value = 17;
+  document.getElementById('m2h-bulan').value = 7;
+  document.getElementById('m2h-tahun').value = 1944;
+  document.getElementById('m2h-btn-hitung').click();
+});
+
+
+/* =====================================================================
+   EVENT HANDLERS — TAB HIJRIYAH -> MASEHI
+   ===================================================================== */
+document.getElementById('h2m-btn-hitung').addEventListener('click', () => {
+  const tanggal = parseInt(document.getElementById('h2m-tanggal').value, 10);
+  const bulan = parseInt(document.getElementById('h2m-bulan').value, 10);
+  const tahun = parseInt(document.getElementById('h2m-tahun').value, 10);
+
+  const errorBox = document.getElementById('h2m-error-msg');
+  const pesanError = validasiTanggalHijriyah(tanggal, bulan, tahun);
+  if (pesanError) {
+    errorBox.textContent = pesanError;
+    errorBox.style.display = "block";
+    document.getElementById('h2m-result-section').style.display = "none";
+    return;
+  }
+  errorBox.style.display = "none";
+
+  const hasil = konversiHijriyahKeMasehi(tanggal, bulan, tahun);
+
+  document.getElementById('h2m-res-asal').textContent = `${tanggal} ${NAMA_BULAN_H[bulan - 1]} ${tahun} H`;
+  document.getElementById('h2m-res-utama').textContent = hasil.hasilAkhir;
+  document.getElementById('h2m-res-note').textContent = `Status tahun hasil: ${hasil.kabisatHasil ? "Kabisat" : "Basithoh"}`;
+
+  document.getElementById('h2m-accordion-content').innerHTML = renderLangkahPerhitungan(hasil.log);
+  document.getElementById('h2m-result-section').style.display = "block";
+  document.getElementById('h2m-result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+document.getElementById('h2m-btn-contoh').addEventListener('click', () => {
+  document.getElementById('h2m-tanggal').value = 1;
+  document.getElementById('h2m-bulan').value = 6;
+  document.getElementById('h2m-tahun').value = 1438;
+  document.getElementById('h2m-btn-hitung').click();
+});
+
+
+/* =====================================================================
+   ACCORDION TOGGLE (dipakai untuk kedua tab)
+   ===================================================================== */
+function setupAccordion(accordionId, headId, bodyId) {
+  const accordion = document.getElementById(accordionId);
+  const head = document.getElementById(headId);
+  const body = document.getElementById(bodyId);
+  head.addEventListener('click', () => {
+    const isOpen = accordion.classList.toggle('open');
+    body.style.maxHeight = isOpen ? body.scrollHeight + "px" : "0px";
+  });
+}
+setupAccordion('m2h-accordion', 'm2h-accordion-head', 'm2h-accordion-body');
+setupAccordion('h2m-accordion', 'h2m-accordion-head', 'h2m-accordion-body');
+</script>
+</body>
+</html>
